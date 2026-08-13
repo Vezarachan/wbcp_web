@@ -48,11 +48,11 @@
 
   // ---------- viz 1: bootstrap masses ----------
   (function () {
-    var W = 720, H = 132, x0 = 16, x1 = 704, base = 102, NBX = 32;
+    var W = 720, H = 132, x0 = 16, x1 = 704, base = 102, NBX = 28;
     var svg = d3.select('#viz-boot').append('svg').attr('viewBox', '0 0 ' + W + ' ' + H)
       .attr('role', 'img').attr('aria-label', 'One Bayesian bootstrap draw of the calibration masses per second');
     var bw = (x1 - x0) / NBX;
-    var mScale = 1650; // bar height per unit binned mass
+    var mScale = 1450; // bar height per unit binned mass
 
     svg.append('line').attr('x1', x0).attr('x2', x1).attr('y1', base).attr('y2', base).attr('stroke', BASE);
     text(svg, x0, 14, 'one draw of the masses  V₁ … Vₙ   (n = ' + S.n + ', equal weights; shown binned over x)', { fill: INK2, 'font-weight': 600 });
@@ -77,7 +77,7 @@
 
   // ---------- viz 2: the same draw, tilted ----------
   (function () {
-    var W = 720, H = 156, base = 110, NBX = 24;
+    var W = 720, H = 156, base = 110, NBX = 14;
     var svg = d3.select('#viz-tilt').append('svg').attr('viewBox', '0 0 ' + W + ' ' + H)
       .attr('role', 'img').attr('aria-label', 'The same mass draw before and after the likelihood-ratio tilt');
     var PL = { x0: 16, x1: 330 }, PR = { x0: 390, x1: 704 };
@@ -109,7 +109,7 @@
     text(svg, PR.x1 - 2, 30, 'w(x)', { 'text-anchor': 'end', fill: RED });
 
     var bwL = (PL.x1 - PL.x0) / NBX, bwR = (PR.x1 - PR.x0) / NBX;
-    var mScale = 1100;
+    var mScale = 640;
     var barsL = svg.selectAll('rect.bl').data(d3.range(NBX)).enter().append('rect')
       .attr('x', function (i) { return PL.x0 + i * bwL + 1; })
       .attr('width', bwL - 2)
@@ -167,7 +167,7 @@
     text(svg, PL.x1 - 2, yRisk(S.ALPHA) - 4, 'target α', { 'text-anchor': 'end', fill: INK, 'font-size': 11.5 });
 
     // right panel: histogram of crossings
-    var LMINH = 4.5, LMAXH = 9, NB = 8;
+    var LMINH = 4.5, LMAXH = 9, NB = 9;
     var xsR = d3.scaleLinear().domain([LMINH, LMAXH]).range([PR.x0, PR.x1]);
     var binW = (LMAXH - LMINH) / NB;
     var histH = base - top - 8;

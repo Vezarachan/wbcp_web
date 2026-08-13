@@ -188,9 +188,10 @@ h2 {
 }
 .step-viz svg { width: 100%; min-width: 560px; height: auto; display: block; }
 
+/* Atom One Dark */
 .algo {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: #282c34;
+  border: 1px solid #21252b;
   border-radius: var(--radius);
   padding: 16px 18px;
   margin: 12px 0;
@@ -198,12 +199,12 @@ h2 {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 13.5px;
   line-height: 1.75;
-  color: var(--ink);
+  color: #abb2bf;
 }
-.algo .c { color: var(--muted); }
-.algo .k { color: #9d3fbf; font-weight: 600; }   /* keywords */
-.algo .fn { color: var(--accent); }              /* function calls */
-.algo .nb { color: #b3541e; }                    /* numbers */
+.algo .c { color: #5c6370; font-style: italic; }  /* comments */
+.algo .k { color: #c678dd; }                      /* keywords */
+.algo .fn { color: #61afef; }                     /* function calls */
+.algo .nb { color: #d19a66; }                     /* numbers */
 
 /* ---------- Certificate ---------- */
 .cert-box {
