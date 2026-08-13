@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weighted Bayesian Conformal Prediction</title>
+  <meta name="description"
+        content="WBCP: the exact Bayesian posterior over the deployed risk under estimated covariate shift.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+<!-- ================= Hero ================= -->
+<header class="hero container">
+  <div class="venue-chip">Preprint &middot; 2026</div>
+  <h1>Weighted Bayesian Conformal Prediction</h1>
+  <p class="authors">
+    <a href="mailto:xiayin.lou@tum.de">Xiayin Lou</a><sup>1</sup> &nbsp;&middot;&nbsp;
+    <a href="mailto:pengluo@mit.edu">Peng Luo</a><sup>2</sup>
+  </p>
+  <p class="affil">
+    <sup>1</sup>Technical University of Munich &nbsp;&nbsp;
+    <sup>2</sup>Massachusetts Institute of Technology
+  </p>
+  <div class="links">
+    <a class="btn" href="static/paper.pdf">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 13h8v1.5H8V13zm0 4h8v1.5H8V17z"/></svg>
+      Paper
+    </a>
+    <a class="btn secondary" href="https://arxiv.org/abs/2604.06464">arXiv</a>
+    <a class="btn secondary" href="https://github.com/Vezarachan/wbcp">Code</a>
+    <a class="btn secondary" href="#bibtex">BibTeX</a>
+  </div>
+</header>
+
+<!-- ================= Hero animation ================= -->
+<section class="container">
+  <div class="anim-block">
+    <div class="stage-pills" id="stage-pills">
+      <button data-stage="0" class="active"><span>1</span> Deployment shifts</button>
+      <button data-stage="1"><span>2</span> Reweight the evidence</button>
+      <button data-stage="2"><span>3</span> Certify at credibility &beta;</button>
+    </div>
+    <div id="hero-anim"></div>
+    <p class="stage-caption" id="stage-caption"></p>
+  </div>
+
+  <p class="lede">
+    Conformal risk control promises &ldquo;risk &le; &alpha;&rdquo; &mdash; but its Bayesian
+    reading, and the failure-rate guarantee that comes with it, exists only when
+    deployment looks exactly like calibration. Our observation: the posterior was never
+    about ranks or spacings. It is a posterior on the <em>calibration distribution</em>
+    itself, and covariate shift is just a change of measure. Pushing the same
+    Bayesian-bootstrap masses through the likelihood ratio gives the <em>exact</em>
+    posterior over the deployed risk &mdash; nothing approximate, at the same
+    O(<em>n</em>) cost &mdash; and the certificate we prove tells you how far to trust
+    it once the ratio itself is estimated.
+  </p>
+</section>
+
+<!-- ================= Abstract ================= -->
+<section class="container">
+  <h2>Abstract</h2>
+  <p class="abstract-text">
+    Machine learning predictors are rarely deployed on data that match the data they
+    were calibrated on. Conformal prediction and its risk-control generalization
+    promise distribution-free guarantees at deployment, but only under exchangeability
+    or a covariate shift whose likelihood ratio is known exactly&mdash;and the
+    estimated-ratio case, the one that occurs in practice, is explicitly open, out of
+    reach of the Bayesian construction available under exchangeability. We reach it
+    from a different starting point: pushing a Dirichlet process prior on the
+    calibration distribution through the likelihood ratio yields the exact Bayesian
+    posterior over the deployed risk. That posterior is exact given the weight
+    function, which at deployment is itself estimated, so we further prove
+    finite-sample upper and lower bounds on the risk the selected threshold actually
+    incurs, in terms of the weight-estimation error and the conditional shift. On
+    synthetic and real covariate shifts, in regression and classification, the
+    realized failure rate then stays close to target where shift-blind selection
+    fails, and what deployment receives is a posterior over the risk of every
+    threshold rather than a single number.
+  </p>
+</section>
+
+<!-- ================= Method: three steps ================= -->
+<section class="container">
+  <h2>From prior to threshold, in three steps</h2>
+
+  <ol class="steps">
+    <li>
+      <h3>Put a prior on the calibration distribution itself.</h3>
+      <p>
+        A Dirichlet-process prior on the calibration law <em>P</em>, concentration
+        &tau; &rarr; 0<sup>+</sup>, leaves the Bayesian bootstrap: the posterior lives on
+        the observed points, each carrying a random mass
+      </p>
+      <div class="eq-line">
+        <em>P</em><sup>*</sup> = &Sigma;<sub>i</sub> <em>V</em><sub>i</sub>&thinsp;&delta;<sub>(X<sub>i</sub>,Y<sub>i</sub>)</sub>,
+        &nbsp;&nbsp;
+        <em>V</em><sub>i</sub> = <em>E</em><sub>i</sub> / &Sigma;<sub>k</sub><em>E</em><sub>k</sub>,
+        &nbsp;&nbsp; <em>E</em><sub>k</sub> ~ Exp(1) i.i.d.
+      </div>
+      <div class="step-viz" id="viz-boot"></div>
+      <p class="step-note">
+        Every second, one fresh draw of the masses <em>V</em><sub>i</sub> &mdash; each draw is
+        one plausible calibration distribution. Nothing beyond i.i.d. sampling enters here
+        &mdash; and crucially, this posterior is about the <em>distribution</em>, not about
+        ranks or quantile spacings, so covariate shift can act on it.
+      </p>
+    </li>
+    <li>
+      <h3>Covariate shift is a change of measure &mdash; apply it to the posterior.</h3>
+      <p>
+        The deployment law is a deterministic functional of the calibration law:
+        tilt by the likelihood ratio, <em>T</em>(<em>Q</em>) = <em>w&middot;Q</em> / &int;<em>w</em>&thinsp;d<em>Q</em>.
+        Applying <em>T</em> to a posterior draw <em>P</em><sup>*</sup> multiplies the mass of point <em>i</em>
+        by <em>w</em><sub>i</sub> and renormalizes &mdash; and the old normalizer
+        &Sigma;<sub>k</sub><em>E</em><sub>k</sub> cancels between numerator and denominator:
+      </p>
+      <div class="eq-line eq-main">
+        V&#771;<sub>i</sub> =
+        <span class="frac">
+          <span class="num"><em>V</em><sub>i</sub><em>w</em><sub>i</sub></span>
+          <span class="den">&Sigma;<sub>j</sub><em>V</em><sub>j</sub><em>w</em><sub>j</sub></span>
+        </span>
+        &nbsp;=&nbsp;
+        <span class="frac">
+          <span class="num"><em>w</em><sub>i</sub><em>E</em><sub>i</sub></span>
+          <span class="den">&Sigma;<sub>j</sub><em>w</em><sub>j</sub><em>E</em><sub>j</sub></span>
+        </span>
+      </div>
+      <div class="step-viz" id="viz-tilt"></div>
+      <p class="step-note">
+        The <em>same</em> draw, before and after the tilt: mass moves toward the points the
+        deployment distribution actually visits. The pushforward of an exact posterior is an
+        exact posterior &mdash; no Dirichlet is assumed at any point. At uniform weights
+        (<em>w</em> &equiv; 1) the exchangeable theory returns unchanged, and Kish&rsquo;s
+        <em>n</em><sub>eff</sub> = (&Sigma;<em>w</em><sub>i</sub>)<sup>2</sup>/&Sigma;<em>w</em><sub>i</sub><sup>2</sup>
+        falls out of the mass law&rsquo;s moments rather than being imposed.
+      </p>
+    </li>
+    <li>
+      <h3>Each draw is one deployed risk curve; select where &beta; of them agree.</h3>
+      <p>
+        A mass draw turns the calibration losses into one candidate deployed risk curve;
+        its &alpha;-crossing is one plausible threshold. Repeating this is the whole
+        sampler &mdash; and it is exactly what the animation above is doing:
+      </p>
+      <pre class="algo"><code>for m = 1 &hellip; M:                                <span class="c"># M &asymp; 1000 draws</span>
+    draw E&#8321;, &hellip;, E&#8345;, E&#8345;&#8330;&#8321; ~ Exp(1)             <span class="c"># one prior draw</span>
+    V&#771;&#7522; &prop; w&#7522;&thinsp;E&#7522;,  test atom V&#771;&#8345;&#8330;&#8321; &prop; w&#772;&thinsp;E&#8345;&#8330;&#8321;      <span class="c"># push through the shift</span>
+    L(&lambda;) = &Sigma;&#7522; V&#771;&#7522;&thinsp;&#8467;(&lambda;; X&#7522;, Y&#7522;) + V&#771;&#8345;&#8330;&#8321;&thinsp;B&#8467;        <span class="c"># deployed risk curve</span>
+    &lambda;&#8317;&#7504;&#8318; = smallest &lambda; with L(&lambda;) &le; &alpha;            <span class="c"># its &alpha;-crossing</span>
+
+&lambda;_HPD = &beta;-quantile of {&lambda;&#8317;&#185;&#8318;, &hellip;, &lambda;&#8317;&#7481;&#8318;}           <span class="c"># the HPD rule</span>
+deploy &lambda;_dep = max(&lambda;_wcp, &lambda;_HPD)                <span class="c"># never below the W-CP quantile</span></code></pre>
+      <div class="step-viz" id="viz-curves"></div>
+      <p class="step-note">
+        Left: each mass draw yields one deployed risk curve, crossing the target &alpha; at
+        that draw&rsquo;s threshold (ticks). Right: the crossings accumulate into the threshold
+        posterior; &lambda;<sub>HPD</sub> is the point that &beta; = 95% of draws declare safe.
+        O(<em>n</em>) per draw &mdash; the exact posterior samples at the cost of the Dirichlet
+        it replaces, and the clamp to the weighted conformal quantile &lambda;<sub>wcp</sub>
+        means the classical marginal guarantee is inherited unchanged.
+      </p>
+    </li>
+  </ol>
+
+  <div class="insight">
+    <b>Nothing is assumed under shift.</b> The Dirichlet of the i.i.d. theory is not
+    postulated and then patched &mdash; it is <em>derived</em> (Bayesian bootstrap on the
+    calibration law) and then pushed through the shift. What deployment adds &mdash; an
+    estimated ratio, a possibly impure shift &mdash; is priced by a finite-sample
+    certificate in the paper, with computable upper and lower bounds on the deployed risk.
+  </div>
+</section>
+
+<!-- ================= Comparison ================= -->
+<section class="container" id="comparison">
+  <h2>Does it hold up at deployment?</h2>
+  <p class="chart-sub" style="text-align:center; max-width:640px; margin:0 auto 6px;">
+    Every rule is asked for the same thing: deployed risk at most &alpha;, failing in at
+    most 5% of calibration sets. Bars show how often each rule&rsquo;s threshold
+    <em>actually</em> exceeded the target risk.
+  </p>
+  <div class="chart-block">
+    <div class="legend-row" id="bars-legend"></div>
+    <div id="bars-chart"></div>
+    <p class="chart-note">
+      BQ-CP and RCPS select as if calibration matched deployment; W-CRC uses the weights
+      but guarantees only an expectation over calibration sets. WBCP is the only rule at
+      the nominal failure rate &mdash; and when the effective sample size cannot support
+      certification, it abstains rather than guessing.
+      <a href="static/paper.pdf">Full tables in the paper &rarr;</a>
+    </p>
+    <div id="bars-table"></div>
+  </div>
+</section>
+
+<!-- ================= BibTeX ================= -->
+<section class="container" id="bibtex">
+  <h2>BibTeX</h2>
+  <div class="bibtex-box">
+    <button class="copy-btn" id="copy-bib">Copy</button>
+    <pre id="bib-text">@article{lou2026weighted,
+  title   = {Weighted Bayesian Conformal Prediction},
+  author  = {Lou, Xiayin and Luo, Peng},
+  journal = {arXiv preprint arXiv:2604.06464},
+  year    = {2026}
+}</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>
+      Website template adapted from the
+      <a href="https://github.com/eliahuhorwitz/Academic-project-page-template">Academic Project Page Template</a>,
+      licensed under
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+    </p>
+  </div>
+</footer>
+
+<div id="tooltip" role="status" aria-hidden="true"></div>
+
+<script src="static/js/d3.v7.min.js"></script>
+<script src="static/js/hero.js"></script>
+<script src="static/js/steps.js"></script>
+<script src="static/js/compare.js"></script>
+<script>
+  document.getElementById('copy-bib').addEventListener('click', function () {
+    var btn = this;
+    navigator.clipboard.writeText(document.getElementById('bib-text').textContent)
+      .then(function () {
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+      });
+  });
+</script>
+</body>
+</html>
