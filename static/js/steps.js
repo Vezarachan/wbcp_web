@@ -149,7 +149,7 @@
     text(svg, PL.x1 - 2, yRisk(S.ALPHA) - 4, 'target α', { 'text-anchor': 'end', fill: INK, 'font-size': 10 });
 
     // right panel: histogram of crossings
-    var LMINH = 4.5, LMAXH = 9, NB = 26;
+    var LMINH = 4.5, LMAXH = 9, NB = 12;
     var xsR = d3.scaleLinear().domain([LMINH, LMAXH]).range([PR.x0, PR.x1]);
     var binW = (LMAXH - LMINH) / NB;
     var histH = base - top - 8;

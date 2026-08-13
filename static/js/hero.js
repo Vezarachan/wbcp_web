@@ -199,7 +199,7 @@
 
   // ----- right panel: threshold posterior -----
   var R = { x0: 470, x1: 856, base: 316, top: 120 };
-  var LMIN = 1.6, LMAX = 10.4, NBINS = 30;
+  var LMIN = 2.0, LMAX = 9.6, NBINS = 19;
   var lamScale = d3.scaleLinear().domain([LMIN, LMAX]).range([R.x0, R.x1]);
   var binW = (LMAX - LMIN) / NBINS;
   var histH = R.base - R.top - 24;
@@ -210,7 +210,7 @@
   gr.append('line').attr('x1', R.x0).attr('x2', R.x1).attr('y1', R.base).attr('y2', R.base)
     .attr('stroke', BASE);
   text(gr, (R.x0 + R.x1) / 2, R.base + 30, 'threshold λ', { 'text-anchor': 'middle', fill: MUTED });
-  d3.range(2, 11, 2).forEach(function (v) {
+  d3.range(2, 10, 2).forEach(function (v) {
     text(gr, lamScale(v), R.base + 16, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 10 });
   });
 
