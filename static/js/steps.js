@@ -36,29 +36,40 @@
   }
   redraw();
 
+  // ---------- shared: aggregate point masses into coarse x-bins for display ----------
+  function binMasses(masses, nb) {
+    var b = new Array(nb).fill(0);
+    for (var i = 0; i < S.n; i++) {
+      var k = Math.min(nb - 1, Math.floor((S.X[i] - S.XA) / (S.XB - S.XA) * nb));
+      b[k] += masses[i];
+    }
+    return b;
+  }
+
   // ---------- viz 1: bootstrap masses ----------
   (function () {
-    var W = 720, H = 128, x0 = 16, x1 = 704, base = 100;
+    var W = 720, H = 132, x0 = 16, x1 = 704, base = 102, NBX = 32;
     var svg = d3.select('#viz-boot').append('svg').attr('viewBox', '0 0 ' + W + ' ' + H)
       .attr('role', 'img').attr('aria-label', 'One Bayesian bootstrap draw of the calibration masses per second');
-    var xs = d3.scaleLinear().domain([S.XA - 0.1, S.XB + 0.1]).range([x0, x1]);
-    var mScale = 5200; // stem height per unit mass
+    var bw = (x1 - x0) / NBX;
+    var mScale = 1650; // bar height per unit binned mass
 
     svg.append('line').attr('x1', x0).attr('x2', x1).attr('y1', base).attr('y2', base).attr('stroke', BASE);
-    text(svg, x0, 14, 'one draw of the masses  V₁ … Vₙ   (n = ' + S.n + ', equal weights)', { fill: INK2, 'font-weight': 600 });
-    text(svg, (x0 + x1) / 2, base + 18, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
+    text(svg, x0, 14, 'one draw of the masses  V₁ … Vₙ   (n = ' + S.n + ', equal weights; shown binned over x)', { fill: INK2, 'font-weight': 600 });
+    text(svg, (x0 + x1) / 2, base + 20, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
 
-    var stems = svg.selectAll('line.stem').data(S.X).enter().append('line')
-      .attr('class', 'stem')
-      .attr('x1', function (d) { return xs(d); }).attr('x2', function (d) { return xs(d); })
-      .attr('y1', base).attr('y2', base)
-      .attr('stroke', BLUE).attr('stroke-width', 1.6).attr('stroke-opacity', 0.6);
-    svg.selectAll('circle.pt').data(S.X).enter().append('circle')
-      .attr('cx', function (d) { return xs(d); }).attr('cy', base).attr('r', 1.6).attr('fill', INK2);
+    var bars = svg.selectAll('rect.m').data(d3.range(NBX)).enter().append('rect')
+      .attr('x', function (i) { return x0 + i * bw + 1.5; })
+      .attr('width', bw - 3)
+      .attr('y', base).attr('height', 0)
+      .attr('rx', 2)
+      .attr('fill', BLUE).attr('fill-opacity', 0.7);
 
     function update() {
-      stems.transition().duration(420)
-        .attr('y2', function (d, i) { return base - Math.min(78, V[i] * mScale); });
+      var b = binMasses(V, NBX);
+      bars.transition().duration(420)
+        .attr('y', function (i) { return base - Math.min(82, b[i] * mScale); })
+        .attr('height', function (i) { return Math.min(82, b[i] * mScale); });
     }
     update();
     window.__vizBootUpdate = update;
@@ -66,32 +77,30 @@
 
   // ---------- viz 2: the same draw, tilted ----------
   (function () {
-    var W = 720, H = 152, base = 108;
+    var W = 720, H = 156, base = 110, NBX = 24;
     var svg = d3.select('#viz-tilt').append('svg').attr('viewBox', '0 0 ' + W + ' ' + H)
       .attr('role', 'img').attr('aria-label', 'The same mass draw before and after the likelihood-ratio tilt');
     var PL = { x0: 16, x1: 330 }, PR = { x0: 390, x1: 704 };
-    var xsL = d3.scaleLinear().domain([S.XA - 0.1, S.XB + 0.1]).range([PL.x0, PL.x1]);
-    var xsR = d3.scaleLinear().domain([S.XA - 0.1, S.XB + 0.1]).range([PR.x0, PR.x1]);
-    var mScale = 5200;
 
     [PL, PR].forEach(function (P) {
       svg.append('line').attr('x1', P.x0).attr('x2', P.x1).attr('y1', base).attr('y2', base).attr('stroke', BASE);
     });
     text(svg, PL.x0, 14, 'Vᵢ — calibration masses', { fill: INK2, 'font-weight': 600 });
     text(svg, PR.x0, 14, 'Ṽᵢ ∝ wᵢVᵢ — deployed masses', { fill: BLUE, 'font-weight': 600 });
-    text(svg, (PL.x0 + PL.x1) / 2, base + 18, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
-    text(svg, (PR.x0 + PR.x1) / 2, base + 18, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
+    text(svg, (PL.x0 + PL.x1) / 2, base + 20, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
+    text(svg, (PR.x0 + PR.x1) / 2, base + 20, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
 
     // arrow between panels
-    svg.append('path').attr('d', 'M344 62 h22 m0 0 l-7 -5 m7 5 l-7 5')
+    svg.append('path').attr('d', 'M344 64 h22 m0 0 l-7 -5 m7 5 l-7 5')
       .attr('stroke', INK2).attr('stroke-width', 1.6).attr('fill', 'none')
       .attr('stroke-linecap', 'round');
-    text(svg, 355, 46, '× wᵢ', { 'text-anchor': 'middle', fill: INK2, 'font-size': 13.5, 'font-weight': 600 });
+    text(svg, 355, 48, '× wᵢ', { 'text-anchor': 'middle', fill: INK2, 'font-size': 13.5, 'font-weight': 600 });
 
     // w(x) curve on the right panel
+    var xsR = d3.scaleLinear().domain([S.XA, S.XB]).range([PR.x0, PR.x1]);
     var wPath = d3.range(80).map(function (k) {
       var x = S.XA + (S.XB - S.XA) * k / 79;
-      return [xsR(x), base - 8 - 60 * Math.exp(S.GAMMA * (x - 2)) / Math.exp(S.GAMMA * (S.XB - 2))];
+      return [xsR(x), base - 10 - 58 * Math.exp(S.GAMMA * (x - 2)) / Math.exp(S.GAMMA * (S.XB - 2))];
     });
     svg.append('path')
       .attr('d', 'M' + wPath.map(function (p) { return p[0] + ' ' + p[1]; }).join('L'))
@@ -99,20 +108,29 @@
       .attr('stroke-dasharray', '4 3').attr('opacity', 0.75);
     text(svg, PR.x1 - 2, 30, 'w(x)', { 'text-anchor': 'end', fill: RED });
 
-    var stemsL = svg.selectAll('line.sl').data(S.X).enter().append('line')
-      .attr('x1', function (d) { return xsL(d); }).attr('x2', function (d) { return xsL(d); })
-      .attr('y1', base).attr('y2', base)
-      .attr('stroke', MUTED).attr('stroke-width', 1.5).attr('stroke-opacity', 0.65);
-    var stemsR = svg.selectAll('line.sr').data(S.X).enter().append('line')
-      .attr('x1', function (d) { return xsR(d); }).attr('x2', function (d) { return xsR(d); })
-      .attr('y1', base).attr('y2', base)
-      .attr('stroke', BLUE).attr('stroke-width', 1.5).attr('stroke-opacity', 0.7);
+    var bwL = (PL.x1 - PL.x0) / NBX, bwR = (PR.x1 - PR.x0) / NBX;
+    var mScale = 1100;
+    var barsL = svg.selectAll('rect.bl').data(d3.range(NBX)).enter().append('rect')
+      .attr('x', function (i) { return PL.x0 + i * bwL + 1; })
+      .attr('width', bwL - 2)
+      .attr('y', base).attr('height', 0)
+      .attr('rx', 2)
+      .attr('fill', MUTED).attr('fill-opacity', 0.6);
+    var barsR = svg.selectAll('rect.br').data(d3.range(NBX)).enter().append('rect')
+      .attr('x', function (i) { return PR.x0 + i * bwR + 1; })
+      .attr('width', bwR - 2)
+      .attr('y', base).attr('height', 0)
+      .attr('rx', 2)
+      .attr('fill', BLUE).attr('fill-opacity', 0.7);
 
     function update() {
-      stemsL.transition().duration(420)
-        .attr('y2', function (d, i) { return base - Math.min(84, V[i] * mScale); });
-      stemsR.transition().duration(420)
-        .attr('y2', function (d, i) { return base - Math.min(84, Vt[i] * mScale); });
+      var bL = binMasses(V, NBX), bR = binMasses(Vt, NBX);
+      barsL.transition().duration(420)
+        .attr('y', function (i) { return base - Math.min(86, bL[i] * mScale); })
+        .attr('height', function (i) { return Math.min(86, bL[i] * mScale); });
+      barsR.transition().duration(420)
+        .attr('y', function (i) { return base - Math.min(86, bR[i] * mScale); })
+        .attr('height', function (i) { return Math.min(86, bR[i] * mScale); });
     }
     update();
     window.__vizTiltUpdate = update;

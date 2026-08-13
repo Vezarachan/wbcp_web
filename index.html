@@ -148,14 +148,16 @@
         its &alpha;-crossing is one plausible threshold. Repeating this is the whole
         sampler &mdash; and it is exactly what the animation above is doing:
       </p>
-      <pre class="algo"><code>for m = 1 &hellip; M:                                <span class="c"># M &asymp; 1000 draws</span>
-    draw E&#8321;, &hellip;, E&#8345;, E&#8345;&#8330;&#8321; ~ Exp(1)             <span class="c"># one prior draw</span>
-    V&#771;&#7522; &prop; w&#7522;&thinsp;E&#7522;,  test atom V&#771;&#8345;&#8330;&#8321; &prop; w&#772;&thinsp;E&#8345;&#8330;&#8321;      <span class="c"># push through the shift</span>
-    L(&lambda;) = &Sigma;&#7522; V&#771;&#7522;&thinsp;&#8467;(&lambda;; X&#7522;, Y&#7522;) + V&#771;&#8345;&#8330;&#8321;&thinsp;B&#8467;        <span class="c"># deployed risk curve</span>
-    &lambda;&#8317;&#7504;&#8318; = smallest &lambda; with L(&lambda;) &le; &alpha;            <span class="c"># its &alpha;-crossing</span>
+      <pre class="algo"><code><span class="k">for</span> m <span class="k">in</span> <span class="fn">range</span>(M):                          <span class="c"># M &asymp; 1000 posterior draws</span>
+    E = <span class="fn">exponential</span>(scale=<span class="nb">1</span>, size=n + <span class="nb">1</span>)   <span class="c"># one Bayesian-bootstrap draw</span>
+    V = w * E[:n]                             <span class="c"># tilt by the likelihood ratio</span>
+    V_test = w_bar * E[n]                     <span class="c"># mass of the unseen test point</span>
+    V, V_test = <span class="fn">normalize</span>(V, V_test)          <span class="c"># &#8594; exact posterior masses V&#771;</span>
+    L = <span class="fn">risk_curve</span>(V, V_test, losses)         <span class="c"># one deployed risk curve L(&lambda;)</span>
+    lam[m] = <span class="fn">crossing</span>(L, alpha)              <span class="c"># this draw's &alpha;-crossing</span>
 
-&lambda;_HPD = &beta;-quantile of {&lambda;&#8317;&#185;&#8318;, &hellip;, &lambda;&#8317;&#7481;&#8318;}           <span class="c"># the HPD rule</span>
-deploy &lambda;_dep = max(&lambda;_wcp, &lambda;_HPD)                <span class="c"># never below the W-CP quantile</span></code></pre>
+lam_hpd = <span class="fn">quantile</span>(lam, beta)               <span class="c"># smallest &lambda; that &beta; of draws call safe</span>
+lam_dep = <span class="fn">max</span>(lam_wcp, lam_hpd)             <span class="c"># never below the W-CP quantile</span></code></pre>
       <div class="step-viz" id="viz-curves"></div>
       <p class="step-note">
         Left: each mass draw yields one deployed risk curve, crossing the target &alpha; at
