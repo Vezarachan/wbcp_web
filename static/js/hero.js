@@ -131,7 +131,7 @@
 
   var INK = '#0b0b0b', INK2 = '#52514e', MUTED = '#898781',
       GRID = '#e1e0d9', BASE = '#c3c2b7',
-      BLUE = '#2a78d6', RED = '#d03b3b', GREEN = '#006300';
+      BLUE = '#4677b5', RED = '#c24545', GREEN = '#429668';
   var FONT = 'system-ui, -apple-system, "Segoe UI", sans-serif';
 
   function text(g, x, y, s, a) {
@@ -227,7 +227,7 @@
     .attr('width', (lamScale(LMIN + binW) - lamScale(LMIN)) - 2)
     .attr('y', R.base).attr('height', 0)
     .attr('rx', 1.5)
-    .attr('fill', MUTED).attr('fill-opacity', 0.75);
+    .attr('fill', BLUE).attr('fill-opacity', 0.75);
 
   // oracle λ* marker
   var starX = lamScale(TEST.lamStar);
@@ -284,7 +284,7 @@
       .attr('r', function (d, i) { return weighted ? 2.5 + 8 * Math.sqrt(Wg[i] / d3.max(Wg)) : 0; })
       .attr('opacity', weighted ? 0.55 : 0);
 
-    barSel.attr('fill', weighted ? BLUE : MUTED);
+    barSel.attr('fill', weighted ? RED : BLUE);
     hpdLbl.text(weighted ? 'λ HPD (β)' : 'λ selected');
   }
 

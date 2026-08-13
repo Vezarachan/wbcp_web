@@ -14,7 +14,7 @@
 
   var INK = '#0b0b0b', INK2 = '#52514e', MUTED = '#898781',
       GRID = '#e1e0d9', BASE = '#c3c2b7',
-      BLUE = '#2a78d6', RED = '#d03b3b';
+      BLUE = '#4677b5', RED = '#c24545';
   var FONT = 'system-ui, -apple-system, "Segoe UI", sans-serif';
 
   function text(g, x, y, s, a) {
@@ -86,7 +86,7 @@
       svg.append('line').attr('x1', P.x0).attr('x2', P.x1).attr('y1', base).attr('y2', base).attr('stroke', BASE);
     });
     text(svg, PL.x0, 14, 'Vᵢ — calibration masses', { fill: INK2, 'font-weight': 600 });
-    text(svg, PR.x0, 14, 'Ṽᵢ ∝ wᵢVᵢ — deployed masses', { fill: BLUE, 'font-weight': 600 });
+    text(svg, PR.x0, 14, 'Ṽᵢ ∝ wᵢVᵢ — deployed masses', { fill: RED, 'font-weight': 600 });
     text(svg, (PL.x0 + PL.x1) / 2, base + 20, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
     text(svg, (PR.x0 + PR.x1) / 2, base + 20, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
 
@@ -115,13 +115,13 @@
       .attr('width', bwL - 2)
       .attr('y', base).attr('height', 0)
       .attr('rx', 2)
-      .attr('fill', MUTED).attr('fill-opacity', 0.6);
+      .attr('fill', BLUE).attr('fill-opacity', 0.55);
     var barsR = svg.selectAll('rect.br').data(d3.range(NBX)).enter().append('rect')
       .attr('x', function (i) { return PR.x0 + i * bwR + 1; })
       .attr('width', bwR - 2)
       .attr('y', base).attr('height', 0)
       .attr('rx', 2)
-      .attr('fill', BLUE).attr('fill-opacity', 0.7);
+      .attr('fill', RED).attr('fill-opacity', 0.7);
 
     function update() {
       var bL = binMasses(V, NBX), bR = binMasses(Vt, NBX);
@@ -149,7 +149,7 @@
     var yRisk = d3.scaleLinear().domain([0, 0.42]).range([base, top]);
 
     text(svg, PL.x0, 14, 'each draw → one deployed risk curve L(λ)', { fill: INK2, 'font-weight': 600 });
-    text(svg, PR.x0, 14, 'its α-crossings → threshold posterior', { fill: BLUE, 'font-weight': 600 });
+    text(svg, PR.x0, 14, 'its α-crossings → threshold posterior', { fill: RED, 'font-weight': 600 });
 
     // left axes
     svg.append('line').attr('x1', PL.x0).attr('x2', PL.x1).attr('y1', base).attr('y2', base).attr('stroke', BASE);
@@ -181,7 +181,7 @@
     var bars = svg.selectAll('rect.b').data(d3.range(NB)).enter().append('rect')
       .attr('x', function (i) { return xsR(LMINH + i * binW) + 0.5; })
       .attr('width', (xsR(LMINH + binW) - xsR(LMINH)) - 1)
-      .attr('y', base).attr('height', 0).attr('fill', BLUE).attr('fill-opacity', 0.75).attr('rx', 1);
+      .attr('y', base).attr('height', 0).attr('fill', RED).attr('fill-opacity', 0.75).attr('rx', 1);
     var hpdLine = svg.append('line').attr('y1', top - 4).attr('y2', base).attr('stroke', INK).attr('stroke-width', 1.5);
     var hpdLbl = text(svg, 0, top + 8, 'λ HPD (β)', { fill: INK, 'font-weight': 600, 'text-anchor': 'start' });
     hpdLine.attr('opacity', 0); hpdLbl.attr('opacity', 0);
@@ -217,7 +217,7 @@
       var c = riskCurve();
       var path = curvesG.append('path')
         .attr('d', 'M' + c.pts.map(function (p) { return xsL(p[0]) + ' ' + yRisk(Math.min(p[1], 0.42)); }).join('L'))
-        .attr('fill', 'none').attr('stroke', BLUE).attr('stroke-width', 1.2).attr('opacity', 0.65);
+        .attr('fill', 'none').attr('stroke', RED).attr('stroke-width', 1.2).attr('opacity', 0.65);
       curves.push(path);
       if (curves.length > 14) curves.shift().remove();
       curves.forEach(function (p, i) { p.attr('opacity', 0.12 + 0.5 * (i + 1) / curves.length); });
