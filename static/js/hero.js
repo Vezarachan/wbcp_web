@@ -136,7 +136,7 @@
 
   function text(g, x, y, s, a) {
     var t = g.append('text').attr('x', x).attr('y', y)
-      .attr('font-family', FONT).attr('font-size', 11).attr('fill', INK2).text(s);
+      .attr('font-family', FONT).attr('font-size', 12.5).attr('fill', INK2).text(s);
     for (var k in (a || {})) t.attr(k, a[k]);
     return t;
   }
@@ -144,8 +144,8 @@
   function subText(t, main, sub, rest) {
     t.text(null);
     t.append('tspan').text(main);
-    t.append('tspan').attr('baseline-shift', '-18%').attr('font-size', '8.5').text(sub);
-    t.append('tspan').attr('baseline-shift', '0').attr('font-size', '11.5').text(rest);
+    t.append('tspan').attr('baseline-shift', '-18%').attr('font-size', '10').text(sub);
+    t.append('tspan').attr('baseline-shift', '0').attr('font-size', '13').text(rest);
     return t;
   }
 
@@ -154,12 +154,12 @@
   var xScale = d3.scaleLinear().domain([XA - 0.1, XB + 0.1]).range([L.x0, L.x1]);
 
   var gl = svg.append('g');
-  var glTitle = text(gl, L.x0, 22, 'Calibration set under covariate shift', { 'font-size': 13, 'font-weight': 600, fill: INK });
+  var glTitle = text(gl, L.x0, 22, 'Calibration set under covariate shift', { 'font-size': 15, 'font-weight': 600, fill: INK });
   gl.append('line').attr('x1', L.x0).attr('x2', L.x1).attr('y1', L.base).attr('y2', L.base)
     .attr('stroke', BASE);
   text(gl, (L.x0 + L.x1) / 2, L.base + 30, 'covariate x', { 'text-anchor': 'middle', fill: MUTED });
   [1, 2, 3].forEach(function (v) {
-    text(gl, xScale(v), L.base + 16, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 10 });
+    text(gl, xScale(v), L.base + 16, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 11.5 });
   });
 
   var densY = d3.scaleLinear().domain([0, 0.011]).range([L.base, L.top]);
@@ -180,8 +180,8 @@
     .attr('fill', RED).attr('opacity', 0.10)
     .attr('stroke', RED).attr('stroke-opacity', 0.6).attr('stroke-width', 1.5)
     .attr('stroke-dasharray', '5 3');
-  text(gl, L.x0 + 4, L.top - 26, '— calibration Pₓ', { fill: BLUE, 'font-size': 11 });
-  text(gl, L.x0 + 4, L.top - 12, '-- deployment P̃ₓ', { fill: RED, 'font-size': 11 });
+  text(gl, L.x0 + 4, L.top - 30, '— calibration Pₓ', { fill: BLUE, 'font-size': 12.5 });
+  text(gl, L.x0 + 4, L.top - 14, '-- deployment P̃ₓ', { fill: RED, 'font-size': 12.5 });
 
   // likelihood-ratio rings (the evidence weights) + posterior-mass dots
   var haloSel = gl.selectAll('circle.halo').data(X).enter().append('circle')
@@ -195,23 +195,23 @@
     .attr('cx', function (d) { return xScale(d); }).attr('cy', L.base)
     .attr('r', 3).attr('fill', BLUE).attr('fill-opacity', 0.5)
     .attr('stroke', BLUE).attr('stroke-width', 0.8);
-  var dotLbl = text(gl, L.x1, L.top - 12, '', { 'text-anchor': 'end', fill: INK2, 'font-size': 11 });
+  var dotLbl = text(gl, L.x1, L.top - 14, '', { 'text-anchor': 'end', fill: INK2, 'font-size': 12.5 });
 
   // ----- right panel: threshold posterior -----
   var R = { x0: 470, x1: 856, base: 316, top: 120 };
-  var LMIN = 2.0, LMAX = 9.6, NBINS = 19;
+  var LMIN = 2.0, LMAX = 9.6, NBINS = 12;
   var lamScale = d3.scaleLinear().domain([LMIN, LMAX]).range([R.x0, R.x1]);
   var binW = (LMAX - LMIN) / NBINS;
   var histH = R.base - R.top - 24;
 
   var gr = svg.append('g');
-  var grTitle = text(gr, R.x0, 22, '', { 'font-size': 13, 'font-weight': 600, fill: INK });
-  text(gr, R.x0, 40, 'target risk α = 0.10 · credibility β = 0.95', { fill: MUTED, 'font-size': 11 });
+  var grTitle = text(gr, R.x0, 22, '', { 'font-size': 15, 'font-weight': 600, fill: INK });
+  text(gr, R.x0, 40, 'target risk α = 0.10 · credibility β = 0.95', { fill: MUTED, 'font-size': 12 });
   gr.append('line').attr('x1', R.x0).attr('x2', R.x1).attr('y1', R.base).attr('y2', R.base)
     .attr('stroke', BASE);
   text(gr, (R.x0 + R.x1) / 2, R.base + 30, 'threshold λ', { 'text-anchor': 'middle', fill: MUTED });
   d3.range(2, 10, 2).forEach(function (v) {
-    text(gr, lamScale(v), R.base + 16, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 10 });
+    text(gr, lamScale(v), R.base + 16, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 11.5 });
   });
 
   // danger zone: thresholds whose deployed risk exceeds α
@@ -219,7 +219,7 @@
     .attr('x', R.x0).attr('y', R.top - 14)
     .attr('width', Math.max(0, lamScale(TEST.lamStar) - R.x0)).attr('height', R.base - R.top + 14)
     .attr('fill', RED).attr('opacity', 0.06);
-  text(gr, R.x0 + 4, R.top - 2, 'deployed risk > α', { fill: RED, 'font-size': 10.5 });
+  text(gr, R.x0 + 4, R.top - 2, 'deployed risk > α', { fill: RED, 'font-size': 12 });
 
   var barSel = gr.selectAll('rect.bar').data(d3.range(NBINS)).enter().append('rect')
     .attr('class', 'bar')
@@ -235,18 +235,18 @@
     .attr('x1', starX).attr('x2', starX)
     .attr('y1', R.top - 14).attr('y2', R.base)
     .attr('stroke', RED).attr('stroke-width', 1.4).attr('stroke-dasharray', '5 3');
-  text(gr, starX - 4, R.top - 20, 'oracle λ*(α)', { fill: RED, 'font-size': 10.5, 'text-anchor': 'end' });
+  text(gr, starX - 4, R.top - 22, 'oracle λ*(α)', { fill: RED, 'font-size': 12, 'text-anchor': 'end' });
 
   // selected threshold marker
   var hpdLine = gr.append('line')
     .attr('y1', R.top + 4).attr('y2', R.base)
     .attr('stroke', INK).attr('stroke-width', 1.6);
-  var hpdLbl = text(gr, 0, R.top - 2, '', { fill: INK, 'font-size': 10.5, 'text-anchor': 'start', 'font-weight': 600 });
+  var hpdLbl = text(gr, 0, R.top - 2, '', { fill: INK, 'font-size': 12, 'text-anchor': 'start', 'font-weight': 600 });
 
   // readouts
-  var roNeff = text(gr, R.x1, 40, '', { 'text-anchor': 'end', 'font-size': 11.5 });
-  var roRisk = text(gr, R.x1, 58, '', { 'text-anchor': 'end', 'font-size': 11.5, 'font-weight': 600 });
-  var roSig  = text(gr, R.x1, 76, '', { 'text-anchor': 'end', 'font-size': 11.5 });
+  var roNeff = text(gr, R.x1, 40, '', { 'text-anchor': 'end', 'font-size': 13 });
+  var roRisk = text(gr, R.x1, 60, '', { 'text-anchor': 'end', 'font-size': 13, 'font-weight': 600 });
+  var roSig  = text(gr, R.x1, 80, '', { 'text-anchor': 'end', 'font-size': 13 });
 
   // ---------- animation state ----------
   var stage = 0, autoplay = true, buffer = [], BUF = 420;

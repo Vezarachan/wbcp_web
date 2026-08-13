@@ -26,7 +26,7 @@
     return n;
   }
   function txt(parent, x, y, s, attrs) {
-    var a = { x: x, y: y, 'font-family': FONT, 'font-size': 11, fill: INK2 };
+    var a = { x: x, y: y, 'font-family': FONT, 'font-size': 12.5, fill: INK2 };
     for (var k in (attrs || {})) a[k] = attrs[k];
     var n = el('text', a, parent);
     n.textContent = s;
@@ -73,7 +73,7 @@
   for (var i = 0; i <= 4; i++) {
     var v = 25 * i;
     el('line', { x1: ml, x2: ml + pw, y1: Y(v), y2: Y(v), stroke: GRID, 'stroke-width': 1 }, svg);
-    txt(svg, ml - 6, Y(v) + 3.5, v + '%', { 'text-anchor': 'end', fill: MUTED, 'font-size': 10 });
+    txt(svg, ml - 6, Y(v) + 3.5, v + '%', { 'text-anchor': 'end', fill: MUTED, 'font-size': 11.5 });
   }
   el('line', { x1: ml, x2: ml + pw, y1: Y(0), y2: Y(0), stroke: BASELINE, 'stroke-width': 1 }, svg);
 
@@ -90,7 +90,7 @@
       var r = el('rect', { x: x, y: Y(v), width: barW, height: Y(0) - Y(v),
         fill: COLORS[m], rx: 3 }, svg);
       txt(svg, x + barW / 2, Y(v) - 5, v.toFixed(v < 10 ? 1 : 0) + '%',
-        { 'text-anchor': 'middle', 'font-size': 10.5, 'font-weight': 600,
+        { 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600,
           fill: m === 'WBCP' ? COLORS['WBCP'] : INK2 });
       r.addEventListener('mousemove', function (e) {
         showTip('<div class="tt-title">' + b.name + '</div>' +
@@ -99,14 +99,14 @@
       });
       r.addEventListener('mouseleave', hideTip);
     });
-    txt(svg, cx, H - mb + 18, b.name, { 'text-anchor': 'middle', fill: INK, 'font-size': 12, 'font-weight': 600 });
-    txt(svg, cx, H - mb + 33, b.sub, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 10.5 });
+    txt(svg, cx, H - mb + 18, b.name, { 'text-anchor': 'middle', fill: INK, 'font-size': 13.5, 'font-weight': 600 });
+    txt(svg, cx, H - mb + 34, b.sub, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 11.5 });
   });
 
   el('line', { x1: ml, x2: ml + pw + 6, y1: Y(5), y2: Y(5),
     stroke: INK, 'stroke-width': 1.2, 'stroke-dasharray': '4 3' }, svg);
-  txt(svg, ml + pw + 10, Y(5) - 2, 'allowed failure', { fill: INK, 'font-size': 10.5 });
-  txt(svg, ml + pw + 10, Y(5) + 11, 'rate 5%', { fill: INK, 'font-size': 10.5 });
+  txt(svg, ml + pw + 10, Y(5) - 2, 'allowed failure', { fill: INK, 'font-size': 12 });
+  txt(svg, ml + pw + 10, Y(5) + 12, 'rate 5%', { fill: INK, 'font-size': 12 });
 
   // accessible table view
   var det = document.createElement('details');

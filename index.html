@@ -35,7 +35,7 @@
 </header>
 
 <!-- ================= Hero animation ================= -->
-<section class="container">
+<section class="container-wide">
   <div class="anim-block">
     <div class="stage-pills" id="stage-pills">
       <button data-stage="0" class="active"><span>1</span> Deployment shifts</button>
@@ -45,7 +45,9 @@
     <div id="hero-anim"></div>
     <p class="stage-caption" id="stage-caption"></p>
   </div>
+</section>
 
+<section class="container" style="padding-top: 0;">
   <p class="lede">
     Conformal risk control promises &ldquo;risk &le; &alpha;&rdquo; &mdash; but its Bayesian
     reading, and the failure-rate guarantee that comes with it, exists only when
@@ -176,7 +178,7 @@ deploy &lambda;_dep = max(&lambda;_wcp, &lambda;_HPD)                <span class
 </section>
 
 <!-- ================= Comparison ================= -->
-<section class="container" id="comparison">
+<section class="container-wide" id="comparison">
   <h2>Does it hold up at deployment?</h2>
   <p class="chart-sub" style="text-align:center; max-width:640px; margin:0 auto 6px;">
     Every rule is asked for the same thing: deployed risk at most &alpha;, failing in at

@@ -29,6 +29,7 @@ body {
 }
 
 .container { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+.container-wide { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
 /* ---------- Hero ---------- */
 .hero { text-align: center; padding: 60px 0 30px; }
@@ -179,8 +180,11 @@ h2 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 10px 12px 6px;
-  margin: 12px 0;
+  margin: 12px 0 12px -52px;   /* break out of the step indent for a larger canvas */
   overflow-x: auto;
+}
+@media (max-width: 640px) {
+  .step-viz { margin-left: 0; }
 }
 .step-viz svg { width: 100%; min-width: 560px; height: auto; display: block; }
 

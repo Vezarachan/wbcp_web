@@ -19,7 +19,7 @@
 
   function text(g, x, y, s, a) {
     var t = g.append('text').attr('x', x).attr('y', y)
-      .attr('font-family', FONT).attr('font-size', 10.5).attr('fill', INK2).text(s);
+      .attr('font-family', FONT).attr('font-size', 12).attr('fill', INK2).text(s);
     for (var k in (a || {})) t.attr(k, a[k]);
     return t;
   }
@@ -86,7 +86,7 @@
     svg.append('path').attr('d', 'M344 62 h22 m0 0 l-7 -5 m7 5 l-7 5')
       .attr('stroke', INK2).attr('stroke-width', 1.6).attr('fill', 'none')
       .attr('stroke-linecap', 'round');
-    text(svg, 355, 46, '× wᵢ', { 'text-anchor': 'middle', fill: INK2, 'font-size': 12, 'font-weight': 600 });
+    text(svg, 355, 46, '× wᵢ', { 'text-anchor': 'middle', fill: INK2, 'font-size': 13.5, 'font-weight': 600 });
 
     // w(x) curve on the right panel
     var wPath = d3.range(80).map(function (k) {
@@ -138,7 +138,7 @@
     [0, 0.2, 0.4].forEach(function (v) {
       svg.append('line').attr('x1', PL.x0).attr('x2', PL.x1).attr('y1', yRisk(v)).attr('y2', yRisk(v))
         .attr('stroke', GRID);
-      text(svg, PL.x0 - 5, yRisk(v) + 3.5, (v * 100) + '%', { 'text-anchor': 'end', fill: MUTED, 'font-size': 9.5 });
+      text(svg, PL.x0 - 5, yRisk(v) + 3.5, (v * 100) + '%', { 'text-anchor': 'end', fill: MUTED, 'font-size': 11 });
     });
     text(svg, (PL.x0 + PL.x1) / 2, base + 18, 'threshold λ', { 'text-anchor': 'middle', fill: MUTED });
     text(svg, (PR.x0 + PR.x1) / 2, base + 18, 'threshold λ', { 'text-anchor': 'middle', fill: MUTED });
@@ -146,26 +146,26 @@
     // α line
     svg.append('line').attr('x1', PL.x0).attr('x2', PL.x1).attr('y1', yRisk(S.ALPHA)).attr('y2', yRisk(S.ALPHA))
       .attr('stroke', INK).attr('stroke-width', 1.2).attr('stroke-dasharray', '4 3');
-    text(svg, PL.x1 - 2, yRisk(S.ALPHA) - 4, 'target α', { 'text-anchor': 'end', fill: INK, 'font-size': 10 });
+    text(svg, PL.x1 - 2, yRisk(S.ALPHA) - 4, 'target α', { 'text-anchor': 'end', fill: INK, 'font-size': 11.5 });
 
     // right panel: histogram of crossings
-    var LMINH = 4.5, LMAXH = 9, NB = 12;
+    var LMINH = 4.5, LMAXH = 9, NB = 8;
     var xsR = d3.scaleLinear().domain([LMINH, LMAXH]).range([PR.x0, PR.x1]);
     var binW = (LMAXH - LMINH) / NB;
     var histH = base - top - 8;
     svg.append('line').attr('x1', PR.x0).attr('x2', PR.x1).attr('y1', base).attr('y2', base).attr('stroke', BASE);
     d3.range(5, 10).forEach(function (v) {
-      text(svg, xsR(v), base + 10, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 9 });
+      text(svg, xsR(v), base + 10, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 11 });
     });
     d3.range(1, 9).forEach(function (v) {
-      text(svg, xsL(v), base + 10, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 9 });
+      text(svg, xsL(v), base + 10, v, { 'text-anchor': 'middle', fill: MUTED, 'font-size': 11 });
     });
     var bars = svg.selectAll('rect.b').data(d3.range(NB)).enter().append('rect')
       .attr('x', function (i) { return xsR(LMINH + i * binW) + 0.5; })
       .attr('width', (xsR(LMINH + binW) - xsR(LMINH)) - 1)
       .attr('y', base).attr('height', 0).attr('fill', BLUE).attr('fill-opacity', 0.75).attr('rx', 1);
     var hpdLine = svg.append('line').attr('y1', top - 4).attr('y2', base).attr('stroke', INK).attr('stroke-width', 1.5);
-    var hpdLbl = text(svg, 0, top - 8, 'λ HPD (β = 0.95)', { fill: INK, 'font-weight': 600, 'text-anchor': 'middle' });
+    var hpdLbl = text(svg, 0, top + 8, 'λ HPD (β)', { fill: INK, 'font-weight': 600, 'text-anchor': 'start' });
     hpdLine.attr('opacity', 0); hpdLbl.attr('opacity', 0);
 
     var curvesG = svg.append('g');
@@ -226,7 +226,7 @@
           var hpd = d3.quantileSorted(crossings.slice().sort(d3.ascending), S.BETA);
           var hx = Math.min(xsR(hpd), PR.x1);
           hpdLine.attr('x1', hx).attr('x2', hx).attr('opacity', 1);
-          hpdLbl.attr('x', hx).attr('opacity', 1);
+          hpdLbl.attr('x', Math.min(hx + 5, PR.x1 - 62)).attr('opacity', 1);
         }
       }
     }
